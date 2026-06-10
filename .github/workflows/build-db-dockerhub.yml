@@ -2,13 +2,15 @@ name: Build & Push DB Image (Docker Hub)
 
 on:
   push:
-    branches: [ "main" ]
-    paths:
-      - "apps/db-image/**"
-      - ".github/workflows/build-db-dockerhub.yml"
-  workflow_dispatch: {}
+    branches: [ "main", "staging", "dev" ]
+
+  pull_request:
+    branches: [ "main", "staging", "dev" ]
+
+  workflow_dispatch:
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   REGISTRY: docker.io
   IMAGE_NAME: jaffleman971/maptdp-db
   TAG: "16.21"
@@ -18,50 +20,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # ------------------------ CHECKOUT ------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show docker info (debug)
-        run: |
-          docker version
-          docker info
-
+      # ------------------------ DOCKER SETUP ------------------------
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          install: true
-          driver: docker-container
-          # image du buildkit si besoin
-          # driver-opts: image=moby/buildkit:latest
 
-      - name: Inspect Buildx (debug)
-        run: |
-          echo "Builder name = ${{ steps.buildx.outputs.name }}"
-          docker buildx version
-          docker buildx ls
-          docker buildx inspect "${{ steps.buildx.outputs.name }}" --bootstrap
-
+      # ------------------------ LOGIN DOCKER HUB ------------------------
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push
+      # ------------------------ BUILD & PUSH ------------------------
+      - name: Build and push DB image
+        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
-          # ⚠️ forcer l'utilisation du builder docker-container créé ci-dessus
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./apps/db-image
-          file: ./apps/db-image/Dockerfile
-          push: true
+          context: .
+          file: Dockerfile
+
           platforms: linux/amd64,linux/arm64
+
+          push: true
+
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
           cache-from: type=gha
           cache-to: type=gha,mode=max
