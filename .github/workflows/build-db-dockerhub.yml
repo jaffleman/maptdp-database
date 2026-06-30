@@ -13,7 +13,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   REGISTRY: docker.io
   IMAGE_NAME: jaffleman971/maptdp-db
-  TAG: "16.22"
+  TAG: "16.23"
 
 jobs:
   build:
