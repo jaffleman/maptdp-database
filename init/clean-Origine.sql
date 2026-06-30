@@ -529,7 +529,7 @@ SET row_security = off;
 -- Name: maptdpbdd; Type: DATABASE; Schema: -; Owner: postgres
 --
 
-CREATE DATABASE maptdpbdd WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
+---CREATE DATABASE maptdpbdd WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
 
 
 ALTER DATABASE maptdpbdd OWNER TO postgres;
