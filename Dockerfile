@@ -2,8 +2,8 @@ FROM postgres:16-alpine
 
 # Évite les locales inutiles, image minimale
 ENV LANG=en_US.utf8 \
-    LC_ALL=en_US.utf8 \
-    POSTGRES_DB=maptdpbdd
+    LC_ALL=en_US.utf8
+    # POSTGRES_DB=maptdpbdd
 
 # Copie des scripts d'init
 # Tous les *.sql et *.sh de ce dossier seront exécutés au premier démarrage (data dir vide)
